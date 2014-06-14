@@ -1,6 +1,6 @@
 PIC ?= 1
 NO_ASM := 1
-CFLAGS += -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -mtune=cortex-a8 -fsigned-char -DNO_ASM -DPAULSCODE -Ofast -ffast-math -fno-strict-aliasing
+CFLAGS += -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9 -fsigned-char -DNO_ASM -DPAULSCODE -Ofast -ffast-math -fno-strict-aliasing
 CFLAGS += -I ../mupen64plus-core/src/api/
 CFLAGS += `sdl-config --cflags`
 
