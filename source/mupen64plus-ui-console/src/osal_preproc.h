@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-ui-console - version.h                                    *
+ *   Mupen64plus-ui-console - osal_preproc.h                               *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
  *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
@@ -19,21 +19,52 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* This header file is for versioning information
+/* This header file is for OS-specific #includes and #defines
  *
  */
 
-#if !defined(VERSION_H)
-#define VERSION_H
+#if !defined(OSAL_PREPROC_H)
+#define OSAL_PREPROC_H
 
-#define CONSOLE_UI_NAME    "Mupen64Plus Console User-Interface"
-#define CONSOLE_UI_VERSION 0x020000
-#define CORE_API_VERSION   0x020001
-#define CONFIG_API_VERSION 0x020000
+#if defined(WIN32)
 
-#define MINIMUM_CORE_VERSION   0x016300
+  #include <windows.h>
+  #define PATH_MAX 2048
+  #define OSAL_DEFAULT_DYNLIB_FILENAME "mupen64plus.dll"
+  #define OSAL_DIR_SEPARATOR           '\\'
+  #define OSAL_CURRENT_DIR             ".\\"
+  #define OSAL_DLL_EXTENSION           ".dll"
+  #define osal_insensitive_strcmp(x, y) _stricmp(x, y)
 
-#define VERSION_PRINTF_SPLIT(x) (((x) >> 16) & 0xffff), (((x) >> 8) & 0xff), ((x) & 0xff)
+#elif defined(__APPLE__)
 
-#endif /* #define VERSION_H */
+  #include <limits.h>  // for PATH_MAX
+  #define OSAL_DEFAULT_DYNLIB_FILENAME "libmupen64plus.dylib"
+  #define OSAL_DIR_SEPARATOR           '/'
+  #define OSAL_CURRENT_DIR             "./"
+  #define OSAL_DLL_EXTENSION           ".dylib"
+  #define osal_insensitive_strcmp(x, y) strcasecmp(x, y)
+
+#else  /* Linux-like UNIX */
+
+  #if defined(ANDROID)
+    #include <android/log.h>
+    #define printf(...) __android_log_print(ANDROID_LOG_VERBOSE, "UI-Console", __VA_ARGS__)
+  #endif
+
+  #include <limits.h>  // for PATH_MAX
+  #define OSAL_DEFAULT_DYNLIB_FILENAME "libmupen64plus.so.2"
+  #define OSAL_DIR_SEPARATOR           '/'
+  #define OSAL_CURRENT_DIR             "./"
+  #define OSAL_DLL_EXTENSION           ".so"
+  #define osal_insensitive_strcmp(x, y) strcasecmp(x, y)
+
+  /* PATH_MAX only may be defined by limits.h */
+  #ifndef PATH_MAX
+    #define PATH_MAX 4096
+  #endif
+
+#endif
+
+#endif /* #define OSAL_PREPROC_H */
 

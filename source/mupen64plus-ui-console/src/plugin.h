@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-rsp-hle - hle.h                                           *
+ *   Mupen64plus-ui-console - plugin.h                                     *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2014 Bobby Smiles                                       *
+ *   Copyright (C) 2009 Richard42                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,36 +19,32 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef HLE_H
-#define HLE_H
+#if !defined(PLUGIN_H)
+#define PLUGIN_H
 
-#include "hle_internal.h"
+#include "m64p_types.h"
+#include "osal_preproc.h"
 
-void hle_init(struct hle_t* hle,
-    unsigned char* dram,
-    unsigned char* dmem,
-    unsigned char* imem,
-    unsigned int* mi_intr,
-    unsigned int* sp_mem_addr,
-    unsigned int* sp_dram_addr,
-    unsigned int* sp_rd_length,
-    unsigned int* sp_wr_length,
-    unsigned int* sp_status,
-    unsigned int* sp_dma_full,
-    unsigned int* sp_dma_busy,
-    unsigned int* sp_pc,
-    unsigned int* sp_semaphore,
-    unsigned int* dpc_start,
-    unsigned int* dpc_end,
-    unsigned int* dpc_current,
-    unsigned int* dpc_status,
-    unsigned int* dpc_clock,
-    unsigned int* dpc_bufbusy,
-    unsigned int* dpc_pipebusy,
-    unsigned int* dpc_tmem,
-    void* user_defined);
+extern m64p_error PluginSearchLoad(m64p_handle ConfigUI);
+extern m64p_error PluginUnload(void);
 
-void hle_execute(struct hle_t* hle);
+extern const char *g_PluginDir;        // directory to search for plugins
+extern const char *g_GfxPlugin;        // graphics plugin specified at commandline (if any)
+extern const char *g_AudioPlugin;      // audio plugin specified at commandline (if any)
+extern const char *g_InputPlugin;      // input plugin specified at commandline (if any)
+extern const char *g_RspPlugin;        // rsp plugin specified at commandline (if any)
 
-#endif
+typedef struct {
+  m64p_plugin_type    type;
+  char                name[8];
+  m64p_dynlib_handle  handle;
+  char                filename[PATH_MAX];
+  const char         *libname;
+  int                 libversion;
+  } plugin_map_node;
+
+extern plugin_map_node g_PluginMap[4];
+
+#endif /* #define PLUGIN_H */
+
 

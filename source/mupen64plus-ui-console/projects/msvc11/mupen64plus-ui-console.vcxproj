@@ -11,19 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2EC7CEE3-C7A7-4F2E-B2C8-4DF6AFEC3E9A}</ProjectGuid>
-    <RootNamespace>mupen64plusrsphle</RootNamespace>
+    <ProjectGuid>{0E29D9F8-C675-4D21-AF16-AA80EDDB264E}</ProjectGuid>
+    <RootNamespace>mupen64plusuiconsole</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
@@ -55,8 +55,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\mupen64plus-core\src\api;..\..\src\msvc-compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;inline=__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\mupen64plus-core\src\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -64,57 +64,78 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <CompileAs>Default</CompileAs>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\SDLmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Message>Copying shared data and libraries to build directory...</Message>
+      <Command>copy ..\..\..\mupen64plus-core\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-video-rice\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-video-glide64mk2\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-input-sdl\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\freetype-2.3.5-1\bin\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\libpng-1.2.37\bin\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.3\bin\*.dll "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\mupen64plus-core\src\api;..\..\src\msvc-compat;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;inline=__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\..\mupen64plus-core\src\api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CompileAs>Default</CompileAs>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\SDLmain.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Message>Copying shared data and libraries to build directory...</Message>
+      <Command>copy ..\..\..\mupen64plus-core\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-video-rice\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-video-glide64mk2\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-input-sdl\data\* "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\freetype-2.3.5-1\bin\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\libpng-1.2.37\bin\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\*.dll "$(OutDir)"
+copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.3\bin\*.dll "$(OutDir)"
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\alist.c" />
-    <ClCompile Include="..\..\src\alist_audio.c" />
-    <ClCompile Include="..\..\src\alist_naudio.c" />
-    <ClCompile Include="..\..\src\alist_nead.c" />
-    <ClCompile Include="..\..\src\audio.c" />
-    <ClCompile Include="..\..\src\cicx105.c" />
-    <ClCompile Include="..\..\src\hle.c" />
-    <ClCompile Include="..\..\src\jpeg.c" />
-    <ClCompile Include="..\..\src\memory.c" />
-    <ClCompile Include="..\..\src\mp3.c" />
-    <ClCompile Include="..\..\src\musyx.c" />
+    <ClCompile Include="..\..\src\cheat.c" />
+    <ClCompile Include="..\..\src\compare_core.c" />
+    <ClCompile Include="..\..\src\core_interface.c" />
+    <ClCompile Include="..\..\src\main.c" />
+    <ClCompile Include="..\..\src\osal_dynamiclib_win32.c" />
+    <ClCompile Include="..\..\src\osal_files_win32.c" />
     <ClCompile Include="..\..\src\plugin.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\alist.h" />
-    <ClInclude Include="..\..\src\arithmetics.h" />
-    <ClInclude Include="..\..\src\audio.h" />
-    <ClInclude Include="..\..\src\common.h" />
-    <ClInclude Include="..\..\src\hle.h" />
-    <ClInclude Include="..\..\src\hle_external.h" />
-    <ClInclude Include="..\..\src\hle_internal.h" />
-    <ClInclude Include="..\..\src\memory.h" />
-    <ClInclude Include="..\..\src\ucodes.h" />
+    <ClInclude Include="..\..\src\cheat.h" />
+    <ClInclude Include="..\..\src\compare_core.h" />
+    <ClInclude Include="..\..\src\core_interface.h" />
+    <ClInclude Include="..\..\src\main.h" />
+    <ClInclude Include="..\..\src\osal_dynamiclib.h" />
+    <ClInclude Include="..\..\src\osal_files.h" />
+    <ClInclude Include="..\..\src\osal_preproc.h" />
+    <ClInclude Include="..\..\src\plugin.h" />
+    <ClInclude Include="..\..\src\version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-ui-console - version.h                                    *
+ *   Mupen64plus-ui-console - osal_dynamiclib_unix.c                       *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
  *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
@@ -19,21 +19,53 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* This header file is for versioning information
- *
- */
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <dlfcn.h>
 
-#if !defined(VERSION_H)
-#define VERSION_H
+#include "main.h"
+#include "m64p_types.h"
+#include "osal_dynamiclib.h"
 
-#define CONSOLE_UI_NAME    "Mupen64Plus Console User-Interface"
-#define CONSOLE_UI_VERSION 0x020000
-#define CORE_API_VERSION   0x020001
-#define CONFIG_API_VERSION 0x020000
+m64p_error osal_dynlib_open(m64p_dynlib_handle *pLibHandle, const char *pccLibraryPath)
+{
+    if (pLibHandle == NULL || pccLibraryPath == NULL)
+        return M64ERR_INPUT_ASSERT;
 
-#define MINIMUM_CORE_VERSION   0x016300
+    *pLibHandle = dlopen(pccLibraryPath, RTLD_NOW);
 
-#define VERSION_PRINTF_SPLIT(x) (((x) >> 16) & 0xffff), (((x) >> 8) & 0xff), ((x) & 0xff)
+    if (*pLibHandle == NULL)
+    {
+        /* only print an error message if there is a directory separator (/) in the pathname */
+        /* this prevents us from throwing an error for the use case where Mupen64Plus is not installed */
+        if (strchr(pccLibraryPath, '/') != NULL)
+            DebugMessage(M64MSG_ERROR, "dlopen('%s') failed: %s", pccLibraryPath, dlerror());
+        return M64ERR_INPUT_NOT_FOUND;
+    }
 
-#endif /* #define VERSION_H */
+    return M64ERR_SUCCESS;
+}
+
+void * osal_dynlib_getproc(m64p_dynlib_handle LibHandle, const char *pccProcedureName)
+{
+    if (pccProcedureName == NULL)
+        return NULL;
+
+    return dlsym(LibHandle, pccProcedureName);
+}
+
+m64p_error osal_dynlib_close(m64p_dynlib_handle LibHandle)
+{
+    int rval = dlclose(LibHandle);
+
+    if (rval != 0)
+    {
+        DebugMessage(M64MSG_ERROR, "dlclose() failed: %s", dlerror());
+        return M64ERR_INTERNAL;
+    }
+
+    return M64ERR_SUCCESS;
+}
+
 

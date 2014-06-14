@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-rsp-hle - hle.h                                           *
+ *   Mupen64plus - cheat.h                                                 *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2014 Bobby Smiles                                       *
+ *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,36 +19,23 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef HLE_H
-#define HLE_H
+#ifndef CHEAT_H
+#define CHEAT_H
 
-#include "hle_internal.h"
-
-void hle_init(struct hle_t* hle,
-    unsigned char* dram,
-    unsigned char* dmem,
-    unsigned char* imem,
-    unsigned int* mi_intr,
-    unsigned int* sp_mem_addr,
-    unsigned int* sp_dram_addr,
-    unsigned int* sp_rd_length,
-    unsigned int* sp_wr_length,
-    unsigned int* sp_status,
-    unsigned int* sp_dma_full,
-    unsigned int* sp_dma_busy,
-    unsigned int* sp_pc,
-    unsigned int* sp_semaphore,
-    unsigned int* dpc_start,
-    unsigned int* dpc_end,
-    unsigned int* dpc_current,
-    unsigned int* dpc_status,
-    unsigned int* dpc_clock,
-    unsigned int* dpc_bufbusy,
-    unsigned int* dpc_pipebusy,
-    unsigned int* dpc_tmem,
-    void* user_defined);
-
-void hle_execute(struct hle_t* hle);
-
+#ifdef M64P_BIG_ENDIAN
+  #define sl(mot) mot
+#else
+  #define sl(mot) (((mot & 0xFF) << 24) | ((mot & 0xFF00) <<  8) | ((mot & 0xFF0000) >>  8) | ((mot & 0xFF000000) >> 24))
 #endif
+
+typedef enum {
+  CHEAT_DISABLE,
+  CHEAT_LIST,
+  CHEAT_ALL,
+  CHEAT_SHOW_LIST
+  } eCheatMode;
+
+void CheatStart(eCheatMode CheatMode, char *CheatNumList);
+
+#endif // #define CHEAT_H
 

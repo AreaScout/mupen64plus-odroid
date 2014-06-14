@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-rsp-hle - hle.h                                           *
+ *   Mupen64plus - compare_core.h                                          *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2014 Bobby Smiles                                       *
+ *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,36 +19,16 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef HLE_H
-#define HLE_H
+#if !defined(COMPARE_CORE_H)
+#define COMPARE_CORE_H
 
-#include "hle_internal.h"
+typedef enum {
+  CORE_COMPARE_DISABLE = 0,
+  CORE_COMPARE_SEND = 1,
+  CORE_COMPARE_RECV = 2
+} CoreCompareMode;
 
-void hle_init(struct hle_t* hle,
-    unsigned char* dram,
-    unsigned char* dmem,
-    unsigned char* imem,
-    unsigned int* mi_intr,
-    unsigned int* sp_mem_addr,
-    unsigned int* sp_dram_addr,
-    unsigned int* sp_rd_length,
-    unsigned int* sp_wr_length,
-    unsigned int* sp_status,
-    unsigned int* sp_dma_full,
-    unsigned int* sp_dma_busy,
-    unsigned int* sp_pc,
-    unsigned int* sp_semaphore,
-    unsigned int* dpc_start,
-    unsigned int* dpc_end,
-    unsigned int* dpc_current,
-    unsigned int* dpc_status,
-    unsigned int* dpc_clock,
-    unsigned int* dpc_bufbusy,
-    unsigned int* dpc_pipebusy,
-    unsigned int* dpc_tmem,
-    void* user_defined);
+void compare_core_init(int mode);
 
-void hle_execute(struct hle_t* hle);
-
-#endif
+#endif /* COMPARE_CORE_H */
 

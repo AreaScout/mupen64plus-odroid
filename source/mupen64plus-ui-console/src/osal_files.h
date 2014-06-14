@@ -1,7 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus-rsp-hle - hle.h                                           *
+ *   Mupen64plus-ui-console - osal_files.h                                 *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2014 Bobby Smiles                                       *
+ *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -19,36 +19,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef HLE_H
-#define HLE_H
+/* This header file is for all kinds of system-dependent file handling
+ *
+ */
 
-#include "hle_internal.h"
+#if !defined(OSAL_FILES_H)
+#define OSAL_FILES_H
 
-void hle_init(struct hle_t* hle,
-    unsigned char* dram,
-    unsigned char* dmem,
-    unsigned char* imem,
-    unsigned int* mi_intr,
-    unsigned int* sp_mem_addr,
-    unsigned int* sp_dram_addr,
-    unsigned int* sp_rd_length,
-    unsigned int* sp_wr_length,
-    unsigned int* sp_status,
-    unsigned int* sp_dma_full,
-    unsigned int* sp_dma_busy,
-    unsigned int* sp_pc,
-    unsigned int* sp_semaphore,
-    unsigned int* dpc_start,
-    unsigned int* dpc_end,
-    unsigned int* dpc_current,
-    unsigned int* dpc_status,
-    unsigned int* dpc_clock,
-    unsigned int* dpc_bufbusy,
-    unsigned int* dpc_pipebusy,
-    unsigned int* dpc_tmem,
-    void* user_defined);
+#include "m64p_types.h"
+#include "osal_preproc.h"
 
-void hle_execute(struct hle_t* hle);
+/* data structure for linked list of shared libraries found in a directory */
+typedef struct _osal_lib_search {
+  char                     filepath[PATH_MAX];
+  char                    *filename;
+  m64p_plugin_type         plugin_type;
+  struct _osal_lib_search *next;
+  } osal_lib_search;
 
-#endif
+/* const definitions for system directories to search when looking for mupen64plus plugins */
+extern const int   osal_libsearchdirs;
+extern const char *osal_libsearchpath[];
+
+/* functions for searching for shared libraries in a given directory */
+extern osal_lib_search *osal_library_search(const char *searchpath);
+extern void             osal_free_lib_list(osal_lib_search *head);
+
+#endif /* #define OSAL_FILES_H */
 

@@ -1,8 +1,7 @@
 #/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-# *   mupen64plus-rsp-hle - Makefile                                        *
+# *   Mupen64plus - Makefile                                                *
 # *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
-# *   Copyright (C) 2008-2009 Richard Goedeken                              *
-# *   Copyright (C) 2007-2008 DarkJeztr Tillin9                             *
+# *   Copyright (C) 2009 Richard42                                          *
 # *                                                                         *
 # *   This program is free software; you can redistribute it and/or modify  *
 # *   it under the terms of the GNU General Public License as published by  *
@@ -19,52 +18,35 @@
 # *   Free Software Foundation, Inc.,                                       *
 # *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-# Makefile for Mupen64 HLE RSP plugin in Mupen64plus.
+# Makefile for Mupen64plus-ui-console
 
-# detect operating system
+# detect operation system
 UNAME ?= $(shell uname -s)
 OS := NONE
 ifeq ("$(UNAME)","Linux")
   OS = LINUX
-  SO_EXTENSION = so
-  SHARED = -shared
 endif
 ifeq ("$(UNAME)","linux")
   OS = LINUX
-  SO_EXTENSION = so
-  SHARED = -shared
 endif
 ifneq ("$(filter GNU hurd,$(UNAME))","")
   OS = LINUX
-  SO_EXTENSION = so
-  SHARED = -shared
 endif
 ifeq ("$(UNAME)","Darwin")
   OS = OSX
-  SO_EXTENSION = dylib
-  SHARED = -bundle
 endif
 ifeq ("$(UNAME)","FreeBSD")
   OS = FREEBSD
-  SO_EXTENSION = so
-  SHARED = -shared
 endif
 ifeq ("$(UNAME)","OpenBSD")
   OS = FREEBSD
-  SO_EXTENSION = so
-  SHARED = -shared
   $(warning OS type "$(UNAME)" not officially supported.')
 endif
 ifneq ("$(filter GNU/kFreeBSD kfreebsd,$(UNAME))","")
   OS = LINUX
-  SO_EXTENSION = so
-  SHARED = -shared
 endif
 ifeq ("$(patsubst MINGW%,MINGW,$(UNAME))","MINGW")
   OS = MINGW
-  SO_EXTENSION = dll
-  SHARED = -shared
-  PIC = 0
 endif
 ifeq ("$(OS)","NONE")
   $(error OS type "$(UNAME)" not supported.  Please file bug report at 'http://code.google.com/p/mupen64plus/issues')
@@ -78,36 +60,30 @@ ifneq ("$(filter x86_64 amd64,$(HOST_CPU))","")
   CPU := X86
   ifeq ("$(BITS)", "32")
     ARCH_DETECTED := 64BITS_32
-    PIC ?= 0
   else
     ARCH_DETECTED := 64BITS
-    PIC ?= 1
   endif
 endif
 ifneq ("$(filter pentium i%86,$(HOST_CPU))","")
   CPU := X86
   ARCH_DETECTED := 32BITS
-  PIC ?= 0
 endif
 ifneq ("$(filter ppc macppc socppc powerpc,$(HOST_CPU))","")
   CPU := PPC
   ARCH_DETECTED := 32BITS
   BIG_ENDIAN := 1
-  PIC ?= 1
   $(warning Architecture "$(HOST_CPU)" not officially supported.')
 endif
 ifneq ("$(filter ppc64 powerpc64,$(HOST_CPU))","")
   CPU := PPC
   ARCH_DETECTED := 64BITS
   BIG_ENDIAN := 1
-  PIC ?= 1
   $(warning Architecture "$(HOST_CPU)" not officially supported.')
 endif
 ifneq ("$(filter arm%,$(HOST_CPU))","")
   ifeq ("$(filter arm%b,$(HOST_CPU))","")
     CPU := ARM
     ARCH_DETECTED := 32BITS
-    PIC ?= 1
     $(warning Architecture "$(HOST_CPU)" not officially supported.')
   endif
 endif
@@ -118,15 +94,55 @@ endif
 # base CFLAGS, LDLIBS, and LDFLAGS
 OPTFLAGS ?= -O3 -flto
 WARNFLAGS ?= -Wall
-CFLAGS += $(OPTFLAGS) $(WARNFLAGS) -ffast-math -fno-strict-aliasing -fvisibility=hidden -I../../src
-LDFLAGS += $(SHARED)
 
-# Since we are building a shared library, we must compile with -fPIC on some architectures
-# On 32-bit x86 systems we do not want to use -fPIC because we don't have to and it has a big performance penalty on this arch
-ifeq ($(PIC), 1)
-  CFLAGS += -fPIC
+CFLAGS += $(OPTFLAGS) $(WARNFLAGS) -ffast-math -fno-strict-aliasing -I../../src
+ifeq ($(OS), MINGW)
+  CFLAGS += -lpthread
+  LDLIBS += -lpthread
 else
-  CFLAGS += -fno-PIC
+  CFLAGS += -pthread
+  LDLIBS += -pthread
+endif
+
+ifeq ($(PIE), 1)
+  CFLAGS += -fPIE
+  LDFLAGS += -pie
+else
+  CFLAGS += -fno-PIE
+endif
+
+# set special flags per-system
+ifeq ($(OS), LINUX)
+  LDLIBS += -ldl
+endif
+ifeq ($(OS), OSX)
+  #xcode-select has been around since XCode 3.0, i.e. OS X 10.5
+  OSX_SDK_ROOT = $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs
+  OSX_SDK_PATH = $(OSX_SDK_ROOT)/$(shell ls $(OSX_SDK_ROOT) | tail -1)
+
+  ifeq ($(CPU), X86)
+    ifeq ($(ARCH_DETECTED), 64BITS)
+      CFLAGS += -pipe -arch x86_64 -mmacosx-version-min=10.5 -isysroot $(OSX_SDK_PATH)
+    else
+      CFLAGS += -pipe -mmmx -msse -fomit-frame-pointer -arch i686 -mmacosx-version-min=10.5 -isysroot $(OSX_SDK_PATH)
+    endif
+  endif
+endif
+
+# test for presence of SDL
+ifeq ($(origin SDL_CFLAGS) $(origin SDL_LDLIBS), undefined undefined)
+  SDL_CONFIG = $(CROSS_COMPILE)sdl-config
+  ifeq ($(shell which $(SDL_CONFIG) 2>/dev/null),)
+    $(error No SDL development libraries found!)
+  endif
+  SDL_CFLAGS  += $(shell $(SDL_CONFIG) --cflags)
+  SDL_LDLIBS += $(shell $(SDL_CONFIG) --libs)
+endif
+CFLAGS += $(SDL_CFLAGS)
+LDLIBS += $(SDL_LDLIBS)
+
+ifeq ($(OS), MINGW)
+  LDLIBS += -mconsole
 endif
 
 ifeq ($(BIG_ENDIAN), 1)
@@ -140,26 +156,6 @@ ifeq ($(ARCH_DETECTED), 64BITS_32)
   endif
   CFLAGS += -m32
   LDFLAGS += -Wl,-m,elf_i386
-endif
-
-# set special flags per-system
-ifeq ($(OS), LINUX)
-  # only export api symbols
-  LDFLAGS += -Wl,-version-script,$(SRCDIR)/rsp_api_export.ver
-endif
-ifeq ($(OS), OSX)
-  #xcode-select has been around since XCode 3.0, i.e. OS X 10.5
-  OSX_SDK_ROOT = $(shell xcode-select -print-path)/Platforms/MacOSX.platform/Developer/SDKs
-  OSX_SDK_PATH = $(OSX_SDK_ROOT)/$(shell ls $(OSX_SDK_ROOT) | tail -1)
-
-  ifeq ($(CPU), X86)
-    ifeq ($(ARCH_DETECTED), 64BITS)
-      CFLAGS += -pipe -arch x86_64 -mmacosx-version-min=10.5 -isysroot $(OSX_SDK_PATH)
-    else
-      CFLAGS += -pipe -mmmx -msse -fomit-frame-pointer -arch i686 -mmacosx-version-min=10.5 -isysroot $(OSX_SDK_PATH)
-      LDFLAGS += -read_only_relocs suppress
-    endif
-  endif
 endif
 
 # set mupen64plus core API header path
@@ -194,6 +190,7 @@ endif
 
 # set base program pointers and flags
 CC        = $(CROSS_COMPILE)gcc
+CXX       = $(CROSS_COMPILE)g++
 RM       ?= rm -f
 INSTALL  ?= install
 MKDIR ?= mkdir -p
@@ -201,49 +198,60 @@ COMPILE.c = $(Q_CC)$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.o = $(Q_LD)$(CC) $(CFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 
 # set special flags for given Makefile parameters
+# note: COREDIR _must_ end in a slash if you want it to work; not necessary for the others
+ifneq ($(PLUGINDIR),)
+  CFLAGS += '-DPLUGINDIR="$(PLUGINDIR)"'
+endif
+ifneq ($(COREDIR),)
+  CFLAGS += '-DCOREDIR="$(COREDIR)"'
+endif
+ifneq ($(SHAREDIR),)
+  CFLAGS += '-DSHAREDIR="$(SHAREDIR)"'
+endif
 ifeq ($(DEBUG),1)
   CFLAGS += -g
   INSTALL_STRIP_FLAG ?= 
 else
-  ifneq ($(OS),OSX)
-    INSTALL_STRIP_FLAG ?= -s
-  endif
+  INSTALL_STRIP_FLAG ?= -s
 endif
 
 # set installation options
 ifeq ($(PREFIX),)
   PREFIX := /usr/local
 endif
-ifeq ($(LIBDIR),)
-  LIBDIR := $(PREFIX)/lib
+ifeq ($(BINDIR),)
+  BINDIR := $(PREFIX)/bin
 endif
-ifeq ($(PLUGINDIR),)
-  PLUGINDIR := $(LIBDIR)/mupen64plus
+ifeq ($(MANDIR),)
+  MANDIR := $(PREFIX)/share/man
 endif
-
-# enable/disable task dumping support
-ifeq ($(DUMP), 1)
-	CFLAGS += -DENABLE_TASK_DUMP
-endif
-
 
 SRCDIR = ../../src
 OBJDIR = _obj$(POSTFIX)
 
+ifeq ("$(OS)","MINGW")
+  EXEEXT = .exe
+else
+  EXEEXT =
+endif
+
 # list of source files to compile
 SOURCE = \
-	$(SRCDIR)/alist.c \
-	$(SRCDIR)/alist_audio.c \
-	$(SRCDIR)/alist_naudio.c \
-	$(SRCDIR)/alist_nead.c \
-	$(SRCDIR)/audio.c \
-	$(SRCDIR)/cicx105.c \
-	$(SRCDIR)/hle.c \
-	$(SRCDIR)/jpeg.c \
-	$(SRCDIR)/memory.c \
-	$(SRCDIR)/mp3.c \
-	$(SRCDIR)/musyx.c \
+	$(SRCDIR)/cheat.c \
+	$(SRCDIR)/compare_core.c \
+	$(SRCDIR)/core_interface.c \
+	$(SRCDIR)/main.c \
 	$(SRCDIR)/plugin.c
+
+ifeq ($(OS), MINGW)
+SOURCE += \
+	$(SRCDIR)/osal_dynamiclib_win32.c \
+	$(SRCDIR)/osal_files_win32.c
+else
+SOURCE += \
+	$(SRCDIR)/osal_dynamiclib_unix.c \
+	$(SRCDIR)/osal_files_unix.c
+endif
 
 # generate a list of object files build, make a temporary directory for them
 OBJECTS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(filter %.c, $(SOURCE)))
@@ -251,46 +259,49 @@ OBJDIRS = $(dir $(OBJECTS))
 $(shell $(MKDIR) $(OBJDIRS))
 
 # build targets
-TARGET = mupen64plus-rsp-hle$(POSTFIX).$(SO_EXTENSION)
+TARGET = mupen64plus$(POSTFIX)$(EXEEXT)
 
 targets:
-	@echo "Mupen64Plus-rsp-hle makefile. "
+	@echo "Mupen64Plus-ui-console makefile."
 	@echo "  Targets:"
-	@echo "    all           == Build Mupen64Plus rsp-hle plugin"
-	@echo "    clean         == remove object files"
-	@echo "    rebuild       == clean and re-build all"
-	@echo "    install       == Install Mupen64Plus rsp-hle plugin"
-	@echo "    uninstall     == Uninstall Mupen64Plus rsp-hle plugin"
+	@echo "    all            == Build Mupen64Plus console front-end application"
+	@echo "    clean          == remove object files and build products"
+	@echo "    rebuild        == clean and re-build all"
+	@echo "    install        == Install Mupen64Plus console front-end application"
+	@echo "    uninstall      == Uninstall Mupen64Plus console front-end application"
 	@echo "  Options:"
-	@echo "    BITS=32       == build 32-bit binaries on 64-bit machine"
-	@echo "    APIDIR=path   == path to find Mupen64Plus Core headers"
-	@echo "    OPTFLAGS=flag == compiler optimization (default: -O3 -flto)"
+	@echo "    COREDIR=path   == default path to search for Mupen64Plus Core (must end with slash)"
+	@echo "    PLUGINDIR=path == default path to search for plugins"
+	@echo "    SHAREDIR=path  == default path to search for shared data files"
+	@echo "    APIDIR=path    == path to find Mupen64Plus Core headers"
+	@echo "    OPTFLAGS=flags == compiler optimization (default: -O3 -flto)"
 	@echo "    WARNFLAGS=flag == compiler warning levels (default: -Wall)"
-	@echo "    PIC=(1|0)     == Force enable/disable of position independent code"
+	@echo "    PIE=(1|0)      == Force enable/disable of position independent executables"
 	@echo "    POSTFIX=name  == String added to the name of the the build (default: '')"
-	@echo "    DUMP=(1|0)    == Enable/Disable unknown task dumping (default: 0)"
 	@echo "  Install Options:"
-	@echo "    PREFIX=path   == install/uninstall prefix (default: /usr/local)"
-	@echo "    LIBDIR=path   == library prefix (default: PREFIX/lib)"
-	@echo "    PLUGINDIR=path == path to install plugin libraries (default: LIBDIR/mupen64plus)"
-	@echo "    DESTDIR=path  == path to prepend to all installation paths (only for packagers)"
+	@echo "    PREFIX=path    == install/uninstall prefix (default: /usr/local/)"
+	@echo "    BINDIR=path    == path to install mupen64plus binary (default: PREFIX/bin/)"
+	@echo "    MANDIR=path    == path to install mupen64plus manual page (default: PREFIX/share/man)"
+	@echo "    DESTDIR=path   == path to prepend to all installation paths (only for packagers)"
 	@echo "  Debugging Options:"
-	@echo "    DEBUG=1       == add debugging symbols"
-	@echo "    V=1           == show verbose compiler output"
+	@echo "    DEBUG=1        == add debugging symbols to application binary"
+	@echo "    V=1            == show verbose compiler output"
 
 all: $(TARGET)
-
-install: $(TARGET)
-	$(INSTALL) -d "$(DESTDIR)$(PLUGINDIR)"
-	$(INSTALL) -m 0644 $(INSTALL_STRIP_FLAG) $(TARGET) "$(DESTDIR)$(PLUGINDIR)"
-
-uninstall:
-	$(RM) "$(DESTDIR)$(PLUGINDIR)/$(TARGET)"
 
 clean:
 	$(RM) -r $(OBJDIR) $(TARGET)
 
 rebuild: clean all
+
+install: $(TARGET)
+	$(INSTALL) -d "$(DESTDIR)$(BINDIR)"
+	$(INSTALL) -m 0755 $(INSTALL_STRIP_FLAG) $(TARGET) "$(DESTDIR)$(BINDIR)"
+	$(INSTALL) -d "$(DESTDIR)$(MANDIR)/man6"
+	$(INSTALL) -m 0644 ../../doc/mupen64plus.6 "$(DESTDIR)$(MANDIR)/man6"
+
+uninstall:
+	$(RM) "$(DESTDIR)$(BINDIR)/$(TARGET)" "$(DESTDIR)$(MANDIR)/man6/mupen64plus.6"
 
 # build dependency files
 CFLAGS += -MD -MP

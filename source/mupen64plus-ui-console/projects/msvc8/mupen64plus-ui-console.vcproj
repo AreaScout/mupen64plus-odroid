@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="mupen64plus-rsp-hle"
-	ProjectGUID="{2EC7CEE3-C7A7-4F2E-B2C8-4DF6AFEC3E9A}"
-	RootNamespace="mupen64plusrsphle"
+	Name="mupen64plus-ui-console"
+	ProjectGUID="{0E29D9F8-C675-4D21-AF16-AA80EDDB264E}"
+	RootNamespace="mupen64plusuiconsole"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			>
 			<Tool
@@ -40,16 +40,16 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\mupen64plus-core\src\api;..\..\src\msvc-compat"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\..\mupen64plus-core\src\api"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
-				CompileAs="0"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,9 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\SDLmain.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -90,13 +91,15 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copying shared data and libraries to build directory..."
+				CommandLine="copy ..\..\..\mupen64plus-core\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-video-rice\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-input-sdl\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\freetype-2.3.5-1\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\libpng-1.2.37\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.3\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -117,14 +120,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\mupen64plus-core\src\api;..\..\src\msvc-compat"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="..\..\..\mupen64plus-core\src\api"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
-				CompileAs="0"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -137,9 +140,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\SDLmain.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -167,6 +171,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Copying shared data and libraries to build directory..."
+				CommandLine="copy ..\..\..\mupen64plus-core\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-video-rice\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-input-sdl\data\* &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\freetype-2.3.5-1\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\libpng-1.2.37\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\SDL-1.2.14\lib\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.3\bin\*.dll &quot;$(OutDir)&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -179,47 +185,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\alist.c"
+				RelativePath="..\..\src\cheat.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\alist_audio.c"
+				RelativePath="..\..\src\compare_core.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\alist_naudio.c"
+				RelativePath="..\..\src\core_interface.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\alist_nead.c"
+				RelativePath="..\..\src\main.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\audio.c"
+				RelativePath="..\..\src\osal_dynamiclib_win32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\cicx105.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\hle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\jpeg.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\memory.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\mp3.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\musyx.c"
+				RelativePath="..\..\src\osal_files_win32.c"
 				>
 			</File>
 			<File
@@ -233,39 +219,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\src\alist.h"
+				RelativePath="..\..\src\cheat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\audio.h"
+				RelativePath="..\..\src\compare_core.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\arithmetics.h"
+				RelativePath="..\..\src\core_interface.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\common.h"
+				RelativePath="..\..\src\main.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hle.h"
+				RelativePath="..\..\src\osal_dynamiclib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hle_external.h"
+				RelativePath="..\..\src\osal_files.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\hle_internal.h"
+				RelativePath="..\..\src\osal_preproc.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\memory.h"
+				RelativePath="..\..\src\plugin.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ucodes.h"
+				RelativePath="..\..\src\version.h"
 				>
 			</File>
 		</Filter>
