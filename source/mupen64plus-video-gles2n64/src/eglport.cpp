@@ -333,11 +333,11 @@ void OpenCfg ( const char* file )
     strncpy( eglStrings[CFG_STENCIL_SIZE], "size_stencil=", MAX_STRING );
 
     /* Set defaults */
-//#if defined(USE_EGL_SDL)
-//    eglSettings[CFG_MODE]           = RENDER_SDL;
-//#else
+#if defined(USE_EGL_SDL)
+    eglSettings[CFG_MODE]           = RENDER_SDL;
+#else
     eglSettings[CFG_MODE]           = RENDER_RAW;
-//#endif
+#endif
     eglSettings[CFG_VSYNC]          = 0;
     eglSettings[CFG_FSAA]           = 0;
     eglSettings[CFG_FPS]            = 0;
@@ -345,7 +345,7 @@ void OpenCfg ( const char* file )
     eglSettings[CFG_GREEN_SIZE]     = 0;
     eglSettings[CFG_BLUE_SIZE]      = 0;
     eglSettings[CFG_ALPHA_SIZE]     = 0;
-    eglSettings[CFG_DEPTH_SIZE]     = 16;
+    eglSettings[CFG_DEPTH_SIZE]     = 24;
     eglSettings[CFG_BUFFER_SIZE]    = 0;
     eglSettings[CFG_STENCIL_SIZE]   = 0;
 
@@ -418,7 +418,17 @@ int8_t FindEGLConfigs( void )
     ConfigAttribs[attrib++] = 0;                                    /* 26 */
     ConfigAttribs[attrib++] = EGL_NONE;                             /* 27 */
 
-    result = peglChooseConfig( eglDisplay, ConfigAttribs, eglConfigs, totalConfigsIn, &totalConfigsFound );
+    static const EGLint attribute_list[] =
+    {
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+        EGL_NONE
+    };	
+	
+    result = peglChooseConfig( eglDisplay, attribute_list, eglConfigs, 1, &totalConfigsFound );
     if (result != EGL_TRUE || totalConfigsFound == 0)
     {
         CheckEGLErrors( __FILE__, __LINE__ );

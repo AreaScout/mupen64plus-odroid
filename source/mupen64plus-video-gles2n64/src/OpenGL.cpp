@@ -252,19 +252,21 @@ bool OGL_SDL_Start()
     int current_w = config.window.width;
     int current_h = config.window.height;
 */
-    int current_w = 800;
-    int current_h = 480;
+    const SDL_VideoInfo *video_info = SDL_GetVideoInfo();
+
+    int current_w = video_info->current_w;
+    int current_h = video_info->current_h;
     /* Set the video mode */
     LOG(LOG_MINIMAL, "Setting video mode %dx%d...\n", current_w, current_h );
 
 // TODO: I should actually check what the pixelformat is, rather than assuming 16 bpp (RGB_565) or 32 bpp (RGBA_8888):
 //// paulscode, added for switching between modes RGBA8888 and RGB565
 // (part of the color banding fix)
-int bitsPP;
+    int bitsPP;
 /*if( Android_JNI_UseRGBA8888() )
     bitsPP = 32;
 else*/
-    bitsPP = 16;
+    bitsPP = 32;
 ////
 
     // TODO: Replace SDL_SetVideoMode with something that is SDL 2.0 compatible
@@ -276,10 +278,10 @@ else*/
         return FALSE;
     }
 
-//// paulscode, fixes the screen-size problem
+    //// paulscode, fixes the screen-size problem
     const float ratio = ( config.romPAL ? 9.0f/11.0f : 0.75f );
-    int videoWidth = config.window.refwidth;
-    int videoHeight = config.window.refheight;
+    int videoWidth = current_w;
+    int videoHeight = current_h;
     int x = 0;
     int y = 0;
     
@@ -299,8 +301,8 @@ else*/
             videoHeight = (int) (width * ratio);
         }
     } else {
-	videoWidth=800;
-	videoHeight=480;
+	videoWidth=current_w;
+	videoHeight=current_h
     }
     x = (width - videoWidth) / 2;
     y = (height - videoHeight) / 2;
@@ -319,7 +321,7 @@ else*/
 		config.framebuffer.height = (int)videoHeight;
 	}
 	
-	EGL_Open(800, 480);
+	EGL_Open(current_w, current_h);
 ////
     return true;
 }
