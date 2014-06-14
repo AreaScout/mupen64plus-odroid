@@ -1,11 +1,11 @@
 PIC ?= 1
 NO_ASM := 1
 CFLAGS += -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9 -fsigned-char -DNO_ASM -DPAULSCODE -Ofast -ffast-math -fno-strict-aliasing
-CFLAGS += -I ../mupen64plus-core/src/api/
+CFLAGS += -I ../../../mupen64plus-core/src/api/
 CFLAGS += `sdl-config --cflags`
 
 SHARED = -shared
-SRCDIR := src
+SRCDIR := ../../src
 
 MODULE := gles2n64
 SHARED_LIBRARIES := SDL core
@@ -66,10 +66,11 @@ endif
 
 CPPFLAGS := $(CPPFLAGS)
     
-LDLIBS :=         \
-    -lGLESv2		\
-	-lEGL			\
-	-lrt			\
+LDLIBS :=           \
+    -lGLESv2        \
+    -lEGL           \
+    -lrt            \
+    -lSDL           \
 
 # Use for ARM7a:
 SOURCE += $(SRCDIR)/gSPNeon.cpp
