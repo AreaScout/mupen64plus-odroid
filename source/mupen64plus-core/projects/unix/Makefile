@@ -429,7 +429,7 @@ ifneq ($(NO_ASM), 1)
   ifeq ($(CPU), ARM)
     ifeq ($(ARCH_DETECTED), 32BITS)
       DYNAREC = arm
-	  CFLAGS += -DPANDORA
+	  #CFLAGS += -DPANDORA
     endif
   endif
 endif
