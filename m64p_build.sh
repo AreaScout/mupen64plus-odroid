@@ -48,7 +48,7 @@ for component in ${M64P_COMPONENTS}; do
 	fi
 
 	echo "************************************ Building ${component} ${component_type}"
-	"$MAKE" -C source/mupen64plus-${component}/projects/unix clean $@
+	#"$MAKE" -C source/mupen64plus-${component}/projects/unix clean $@
 	"$MAKE" -j5 -C source/mupen64plus-${component}/projects/unix all $@
 	"$MAKE" -j5 -C source/mupen64plus-${component}/projects/unix install $@ ${MAKE_INSTALL} DESTDIR="$(pwd)/test/"
 
@@ -62,5 +62,8 @@ for component in ${M64P_COMPONENTS}; do
 		if [ -e "source/mupen64plus-${component}/doc/${subdoc}" ]; then
 			cp "source/mupen64plus-${component}/doc/${subdoc}" ./test/doc/
 		fi
-	done
+    done
+	if [ ! -f ./test/gles2n64.conf ] ; then
+		touch ./test/gles2n64.conf
+	fi
 done

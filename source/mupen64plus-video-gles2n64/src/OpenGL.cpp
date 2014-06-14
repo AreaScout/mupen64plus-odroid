@@ -302,7 +302,7 @@ else*/
         }
     } else {
 	videoWidth=current_w;
-	videoHeight=current_h
+	videoHeight=current_h;
     }
     x = (width - videoWidth) / 2;
     y = (height - videoHeight) / 2;
