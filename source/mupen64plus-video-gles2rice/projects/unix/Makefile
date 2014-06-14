@@ -112,8 +112,9 @@ ifneq ("$(filter arm%,$(HOST_CPU))","")
     PIC ?= 1
     NO_ASM := 1
     CFLAGS += -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -mtune=cortex-a9 -fsigned-char -ffast-math
-    CFLAGS += -DANDROID
+    #CFLAGS += -DANDROID
     CFLAGS += -DPAULSCODE 
+	SRCDIR := ../../src
     $(warning Architecture "$(HOST_CPU)" not officially supported.')
   endif
 endif
@@ -127,7 +128,7 @@ OPTFLAGS ?= -O4 -ffast-math
 WARNFLAGS ?= -Wall
 CFLAGS += $(OPTFLAGS) $(WARNFLAGS) -ffast-math -fno-strict-aliasing -fvisibility=hidden -I../../src
 CXXFLAGS += -fvisibility-inlines-hidden
-LDFLAGS += $(SHARED)
+LDFLAGS += $(SHARED) 
 
 ifeq ($(CPU), X86)
   CFLAGS += -msse
