@@ -286,8 +286,8 @@ else*/
     int y = 0;
     
     //re-scale width and height on per-rom basis
-    float width = /*(float)videoWidth * (float)config.window.refwidth /*/ 800.f;
-    float height = /*(float)videoHeight * (float)config.window.refheight / */480.f;
+    float width = /*(float)videoWidth * (float)config.window.refwidth /*/ (float)current_w;
+    float height = /*(float)videoHeight * (float)config.window.refheight /*/ (float)current_h;
     
    if (!config.stretchVideo) {
 /*	if ((float)videoWith*480.0f/(float)videoHeight/800.0f>1.0f) {
