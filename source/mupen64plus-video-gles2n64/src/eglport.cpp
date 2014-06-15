@@ -142,6 +142,8 @@ void EGL_Close( void )
     CheckEGLErrors( __FILE__, __LINE__ );
 
     printf( "EGLport: Closed\n" );
+	
+    exit(0); // rudely but working
 }
 
 /** @brief Swap the surface buffer onto the display
